@@ -6,6 +6,7 @@ namespace RoverControl.Core
     {
         public Plateau Plateau { get; }
         public Position Position { get; }
+        public IList<Position> PositionHistory { get; } = new List<Position>();
 
         public Rover(int x, int y, Direction orientation, Plateau plateau)
         {
@@ -16,7 +17,10 @@ namespace RoverControl.Core
 
             this.Plateau = plateau ?? throw new ArgumentNullException(nameof(plateau), "Rover must be assigned to a plateau.");
             this.Position = new Position(x, y, orientation);
+
+            RecordCurrentPosition();
         }
+        public Position GetInitialPosition() => PositionHistory.First();
 
         public void MoveForward()
         {
@@ -35,6 +39,8 @@ namespace RoverControl.Core
                     if (Position.X > 0) Position.X--;
                     break;
             }
+
+            RecordCurrentPosition();
         }
 
         public void TurnLeft()
@@ -47,6 +53,8 @@ namespace RoverControl.Core
                 Direction.E => Direction.N,
                 _ => Position.Orientation
             };
+
+            RecordCurrentPosition();
         }
 
         public void TurnRight()
@@ -59,6 +67,13 @@ namespace RoverControl.Core
                 Direction.W => Direction.N,
                 _ => Position.Orientation
             };
+
+            RecordCurrentPosition();
+        }
+
+        private void RecordCurrentPosition()
+        {
+            PositionHistory.Add(new Position(Position));
         }
     }
 }

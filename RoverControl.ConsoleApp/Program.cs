@@ -5,6 +5,10 @@ namespace RoverControl.ConsoleApp
 {
     internal class Program
     {
+
+        // note to self:
+        // another assumption: there is no collision between rovers if they are on same x,y coord
+
         static void Main(string[] args)
         {
             Console.WriteLine("Enter the file path of your mission:");
@@ -77,13 +81,85 @@ namespace RoverControl.ConsoleApp
                 mission.SendInstructionsToRover(rover, roverInstruction);
             }
 
-            Console.WriteLine();
+            DisplayMission(mission);
+        }
+
+        static void DisplayMission(Mission mission)
+        {
+            Console.Clear();
+
+            Console.WriteLine("Searching for Mars plateau...");
+            Thread.Sleep(2500);
+
+            DisplayPlateau(mission.Plateau, []);
+
+            Console.WriteLine("Landing rovers on plateau...");
+            Thread.Sleep(2500);
+
+            Position[] roverPositionDisplays = new Position[mission.Rovers.Count];
+            for (int i = 0; i < mission.Rovers.Count; i++)
+            {
+                var rover = mission.Rovers.ElementAt(i);
+                roverPositionDisplays[i] = rover.GetInitialPosition();
+            }
+
+            DisplayPlateau(mission.Plateau, roverPositionDisplays);
+            Console.WriteLine($"{mission.Rovers.Count} rovers have landed.");
+
+            Thread.Sleep(2500);
+
+            for (int i = 0; i < mission.Rovers.Count; i++)
+            {
+                var rover = mission.Rovers.ElementAt(i);
+                foreach (var movement in rover.PositionHistory)
+                {
+                    roverPositionDisplays[i] = movement;
+                    DisplayPlateau(mission.Plateau, roverPositionDisplays);
+                    Console.WriteLine($"Rover {i + 1} receiving instructions...");
+
+                    Thread.Sleep(750);
+                }
+            }
+
+            DisplayPlateau(mission.Plateau, roverPositionDisplays);
+
             Console.WriteLine("Final rover positions:");
+            Console.WriteLine();
 
             foreach (var rover in mission.Rovers)
             {
+                Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine($"{rover.Position.X} {rover.Position.Y} {rover.Position.Orientation}");
             }
+
+            Console.ResetColor();
+
+        }
+
+        static void DisplayPlateau(Plateau plateau, IList<Position> roverPositions)
+        {
+            Console.Clear();
+            Console.WriteLine();
+
+            for (int y = plateau.Height - 1; y >= 0; y--)
+            {
+                for (int x = 0; x < plateau.Width; x++)
+                {
+                    var roverOnCoordinate = roverPositions.Reverse().FirstOrDefault(p => p.X == x && p.Y == y);
+                    if (roverOnCoordinate != null)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.Write($"   {roverOnCoordinate.Orientation}   ");
+                        Console.ResetColor();
+                    }
+                    else Console.Write("   *   ");
+                }
+                Console.WriteLine();
+                Console.WriteLine();
+
+            }
+            Console.WriteLine();
+            Console.WriteLine();
         }
     }
 }

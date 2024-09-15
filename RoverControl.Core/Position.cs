@@ -14,5 +14,9 @@ namespace RoverControl.Core
             this.Y = y;
             this.Orientation = orientation;
         }
+
+        public Position(Position other) : this(other.X, other.Y, other.Orientation)
+        {
+        }
     }
 }
