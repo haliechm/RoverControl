@@ -13,10 +13,10 @@ This project is a .NET 8 solution that simulates controlling rovers on a plateau
 ## Assumptions
 1. **No Collision Detection:** Multiple rovers can occupy the same coordinates at the same time. No collision detection occurs, and only one rover is visually represented at each position.
 2. **Reading Instructions from a Text File:** The console application reads all mission instructions from a text file and loads them into memory using a Queue. This approach assumes that the file is relatively small. For larger files, a streaming approach would be used to avoid loading all lines into memory at once.
-3. **Rover Instructions Parsing:** The application assumes that each rover always has two lines of instructions: one for its initial position and one for its movement. If a position line is invalid, the rover is skipped and the next rover is parsed, but both the position and movement lines are consumed regardless. This could lead to issues if a rover has a position line but no corresponding movement line.
-4. **Invalid Movement Characters:** If a movement instruction contains invalid characters (e.g., 'X' or 'P'), the rover ignores them and processes the remaining valid instructions.
-5. **Rovers Stay at Plateau Boundaries:** If a rover attempts to move off the plateau, it will remain at the boundary rather than moving or falling off.
-6. **Auto-Correction for Out-of-Bounds Initial Position:** If a rover's initial position is off the plateau, it is automatically placed at coordinates (0, 0).
+3. **Invalid Movement Characters:** If a movement instruction contains invalid characters (e.g., 'X' or 'P'), the rover ignores them and processes the remaining valid instructions.
+4. **Rovers Stay at Plateau Boundaries:** If a rover attempts to move off the plateau, it will remain at the boundary rather than moving or falling off.
+5. **Auto-Correction for Out-of-Bounds Initial Position:** If a rover's initial position is off the plateau, it is automatically placed at coordinates (0, 0).
+6. **Rover Instructions Parsing:** The application assumes that each rover always has two lines of instructions: one for its initial position and one for its movement. If a position line is invalid, the rover is skipped and the next rover is parsed, but both the position and movement lines are consumed regardless. This could lead to issues if a rover has a position line but no corresponding movement line.
 7. **Early Exit on Critical Errors:** The application exits early if critical errors occur that it cannot recover from, such as an invalid plateau dimension line or empty mission file.
 
 ## Solution Structure
@@ -36,6 +36,7 @@ The solution consists of three projects:
 1. Clone the repository
 ```
 git clone https://github.com/haliechm/RoverControl.git
+cd RoverControl
 ```
 2. Open the solution in Visual Studio 2022
 3. To run the console application:
