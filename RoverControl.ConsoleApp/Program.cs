@@ -5,83 +5,86 @@ namespace RoverControl.ConsoleApp
 {
     internal class Program
     {
-
-        // note to self:
-        // another assumption: there is no collision between rovers if they are on same x,y coord
-
         static void Main(string[] args)
         {
-            Console.WriteLine("Enter the file path of your mission:");
-
-            var filePath = Console.ReadLine();
-
-            if (!File.Exists(filePath))
+            try
             {
-                Console.WriteLine($"Mission file not found: {filePath}");
-                return;
-            }
+                // Prompt user to enter the mission file path
+                Console.WriteLine("Enter the file path of your mission:");
+                var filePath = Console.ReadLine();
 
-            // assumption: file is relatively small
-            // would use streamreader to process each line instead of putting into memory otherwise
-            var fileLines = File.ReadLines(filePath);
-            var missionLines = new Queue<string>(fileLines);
-
-            if (missionLines.Count == 0)
-            {
-                Console.WriteLine("Mission data not found.");
-                return;
-            }
-
-            var plateauDimensions = missionLines.Dequeue().Split();
-
-            if (plateauDimensions.Length != 2 || !int.TryParse(plateauDimensions[0], out int plateauUpperRightXCoord) || !int.TryParse(plateauDimensions[1], out int plateauUpperRightYCoord))
-            {
-                Console.WriteLine("Invalid plateau definition. Ensure first line is two integers separated by a space.");
-                return;
-            }
-
-            if (plateauUpperRightXCoord < 0 || plateauUpperRightYCoord < 0)
-            {
-                Console.WriteLine("Plateau coordinates cannot be negative.");
-                return;
-            }
-
-            var plateau = new Plateau(plateauUpperRightXCoord + 1, plateauUpperRightYCoord + 1);
-            var mission = new Mission(plateau);
-
-            while (missionLines.Count > 0)
-            {
-                if (missionLines.Count < 2)
+                if (!File.Exists(filePath))
                 {
-                    Console.WriteLine("Insufficient instructions given for rover initialization.");
-                    break;
+                    Console.WriteLine($"Mission file not found: {filePath}");
+                    return;
                 }
 
-                // assumption: input always has rover instruction line following rover position line
-                // e.g never 5 5 N \n 2 4 E \n LLMMLRML
-                var roverPosition = missionLines.Dequeue().Split();
-                var roverInstruction = missionLines.Dequeue();
+                // Read the file lines into a queue for processing
+                var missionLines = new Queue<string>(File.ReadLines(filePath));
 
-                if (roverPosition.Length != 3 || !int.TryParse(roverPosition[0], out int roverXCoord) || !int.TryParse(roverPosition[1], out int roverYCoord) || !Enum.TryParse(roverPosition[2], true, out Direction roverOrientation))
+                if (missionLines.Count == 0)
                 {
-                    Console.WriteLine("Invalid rover position instruction.");
-                    continue;
+                    Console.WriteLine("Mission data not found.");
+                    return;
                 }
 
-                if (roverXCoord < 0 || roverXCoord >= plateau.Width || roverYCoord < 0 || roverYCoord >= plateau.Height)
-                {
-                    Console.WriteLine("Initial rover position is out of bounds. Setting initial coordiates to (0, 0)");
+                // Plateau set-up
+                var plateauDimensions = missionLines.Dequeue().Split();
 
-                    // assumption: if invalid coords of rover are given, okay to initially set to (0, 0)
-                    roverXCoord = 0;
-                    roverYCoord = 0;
+                if (plateauDimensions.Length != 2 || !int.TryParse(plateauDimensions[0], out int plateauUpperRightXCoord) || !int.TryParse(plateauDimensions[1], out int plateauUpperRightYCoord))
+                {
+                    Console.WriteLine("Invalid plateau definition. Ensure first line is two integers separated by a space.");
+                    return;
                 }
 
-                var rover = mission.AddRover(roverXCoord, roverYCoord, roverOrientation);
-                mission.SendInstructionsToRover(rover, roverInstruction);
+                if (plateauUpperRightXCoord < 0 || plateauUpperRightYCoord < 0)
+                {
+                    Console.WriteLine("Plateau coordinates cannot be negative.");
+                    return;
+                }
+
+                var plateau = new Plateau(plateauUpperRightXCoord + 1, plateauUpperRightYCoord + 1);
+                var mission = new Mission(plateau);
+
+                // Rover instructions processing
+                while (missionLines.Count > 0)
+                {
+                    // Each rover must have a line to indicate initial postion and a line for movement instructions
+                    if (missionLines.Count < 2)
+                    {
+                        Console.WriteLine("Insufficient instructions given for rover initialization.");
+                        break;
+                    }
+
+                    // Assumption: input always has rover position line followed by rover instruction line
+                    var roverPosition = missionLines.Dequeue().Split();
+                    var roverInstruction = missionLines.Dequeue();
+
+                    if (roverPosition.Length != 3 || !int.TryParse(roverPosition[0], out int roverXCoord) || !int.TryParse(roverPosition[1], out int roverYCoord) || !Enum.TryParse(roverPosition[2], true, out Direction roverOrientation))
+                    {
+                        Console.WriteLine("Invalid rover position instruction.");
+                        continue;
+                    }
+
+                    if (roverXCoord < 0 || roverXCoord >= plateau.Width || roverYCoord < 0 || roverYCoord >= plateau.Height)
+                    {
+                        Console.WriteLine("Initial rover position is out of bounds. Setting initial coordiates to (0, 0)");
+                        roverXCoord = 0;
+                        roverYCoord = 0;
+                    }
+
+                    // Add the rover to the mission and send it instructions
+                    var rover = mission.AddRover(roverXCoord, roverYCoord, roverOrientation);
+                    mission.SendInstructionsToRover(rover, roverInstruction);
+                }
+
+                DisplayMission(mission);
             }
-
-            DisplayMission(mission);
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An unexpected error occurred: {ex.Message}. Could not complete mission.");
+                return;
+            }
         }
 
         static void DisplayMission(Mission mission)
@@ -89,13 +92,15 @@ namespace RoverControl.ConsoleApp
             Console.Clear();
 
             Console.WriteLine("Searching for Mars plateau...");
-            Thread.Sleep(2500);
+            Thread.Sleep(2500); // Simulate search delay
 
+            // Initial plateau display without any rovers
             DisplayPlateau(mission.Plateau, []);
 
             Console.WriteLine("Landing rovers on plateau...");
-            Thread.Sleep(2500);
+            Thread.Sleep(2500); // Simulate landing delay
 
+            // Store initial positions of all rovers
             Position[] roverPositionDisplays = new Position[mission.Rovers.Count];
             for (int i = 0; i < mission.Rovers.Count; i++)
             {
@@ -103,11 +108,13 @@ namespace RoverControl.ConsoleApp
                 roverPositionDisplays[i] = rover.GetInitialPosition();
             }
 
+            // Display plateau with initial rover positions
             DisplayPlateau(mission.Plateau, roverPositionDisplays);
+
             Console.WriteLine($"{mission.Rovers.Count} rovers have landed.");
+            Thread.Sleep(2500); // Simulate delay before starting rover movements
 
-            Thread.Sleep(2500);
-
+            // Display each rover's movements step-by-step
             for (int i = 0; i < mission.Rovers.Count; i++)
             {
                 var rover = mission.Rovers.ElementAt(i);
@@ -116,11 +123,11 @@ namespace RoverControl.ConsoleApp
                     roverPositionDisplays[i] = movement;
                     DisplayPlateau(mission.Plateau, roverPositionDisplays);
                     Console.WriteLine($"Rover {i + 1} receiving instructions...");
-
-                    Thread.Sleep(750);
+                    Thread.Sleep(750); // Simulate delay between each movement
                 }
             }
 
+            // Final plateau display after all movements are complete
             DisplayPlateau(mission.Plateau, roverPositionDisplays);
 
             Console.WriteLine("Final rover positions:");
@@ -133,7 +140,6 @@ namespace RoverControl.ConsoleApp
             }
 
             Console.ResetColor();
-
         }
 
         static void DisplayPlateau(Plateau plateau, IList<Position> roverPositions)
@@ -145,6 +151,7 @@ namespace RoverControl.ConsoleApp
             {
                 for (int x = 0; x < plateau.Width; x++)
                 {
+                    // Check if there's a rover on the current coordinate (if multiple rovers on same coordinate, show last rover)
                     var roverOnCoordinate = roverPositions.Reverse().FirstOrDefault(p => p.X == x && p.Y == y);
                     if (roverOnCoordinate != null)
                     {
