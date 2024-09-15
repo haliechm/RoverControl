@@ -10,7 +10,7 @@ namespace RoverControl.ConsoleApp
             try
             {
                 // Prompt user to enter the mission file path
-                Console.WriteLine("Enter the file path of your mission:");
+                Console.Write("Enter the file path of your mission: ");
                 var filePath = Console.ReadLine();
 
                 if (!File.Exists(filePath))
@@ -75,14 +75,14 @@ namespace RoverControl.ConsoleApp
 
                     // Add the rover to the mission and send it instructions
                     var rover = mission.AddRover(roverXCoord, roverYCoord, roverOrientation);
-                    mission.SendInstructionsToRover(rover, roverInstruction);
+                    Mission.SendInstructionsToRover(rover, roverInstruction);
                 }
 
                 DisplayMission(mission);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"An unexpected error occurred: {ex.Message}. Could not complete mission.");
+                Console.WriteLine($"An unexpected error occurred: {ex.Message}. Mission failed.");
                 return;
             }
         }
@@ -135,7 +135,7 @@ namespace RoverControl.ConsoleApp
 
             foreach (var rover in mission.Rovers)
             {
-                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.ForegroundColor = GetDirectionColor(rover.Position.Orientation);
                 Console.WriteLine($"{rover.Position.X} {rover.Position.Y} {rover.Position.Orientation}");
             }
 
@@ -155,7 +155,7 @@ namespace RoverControl.ConsoleApp
                     var roverOnCoordinate = roverPositions.Reverse().FirstOrDefault(p => p.X == x && p.Y == y);
                     if (roverOnCoordinate != null)
                     {
-                        Console.ForegroundColor = ConsoleColor.Magenta;
+                        Console.ForegroundColor = GetDirectionColor(roverOnCoordinate.Orientation);
                         Console.Write($"   {roverOnCoordinate.Orientation}   ");
                         Console.ResetColor();
                     }
@@ -167,6 +167,18 @@ namespace RoverControl.ConsoleApp
             }
             Console.WriteLine();
             Console.WriteLine();
+        }
+
+        static ConsoleColor GetDirectionColor(Direction direction)
+        {
+            return direction switch
+            {
+                Direction.N => ConsoleColor.Magenta,
+                Direction.S => ConsoleColor.Green,
+                Direction.E => ConsoleColor.Yellow,
+                Direction.W => ConsoleColor.Blue,
+                _ => ConsoleColor.White,
+            };
         }
     }
 }

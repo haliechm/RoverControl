@@ -242,5 +242,18 @@ namespace RoverControl.Tests
             Assert.That(rover.PositionHistory[7].Y, Is.EqualTo(2));
             Assert.That(rover.PositionHistory[7].Orientation, Is.EqualTo(Direction.S));
         }
+
+        [Test]
+        public void Rover_ShouldReturnFirstPositionInHistory()
+        {
+            var rover = new Rover(3, 4, Direction.E, _plateau);
+            rover.TurnRight();
+            rover.MoveForward();
+            rover.TurnLeft();
+            rover.MoveForward();
+            Assert.That(rover.GetInitialPosition().X, Is.EqualTo(3));
+            Assert.That(rover.GetInitialPosition().Y, Is.EqualTo(4));
+            Assert.That(rover.GetInitialPosition().Orientation, Is.EqualTo(Direction.E));
+        }
     }
 }

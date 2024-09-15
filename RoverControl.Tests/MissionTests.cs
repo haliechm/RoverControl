@@ -41,7 +41,7 @@ namespace RoverControl.Tests
         public void Mission_RoverShouldMoveCorrectly_WithSequence_LMLMLMLMM()
         {
             var rover = _mission.AddRover(1, 2, Direction.N);
-            _mission.SendInstructionsToRover(rover, "LMLMLMLMM");
+            Mission.SendInstructionsToRover(rover, "LMLMLMLMM");
 
             Assert.That(rover.Position.X, Is.EqualTo(1));
             Assert.That(rover.Position.Y, Is.EqualTo(3));
@@ -52,7 +52,7 @@ namespace RoverControl.Tests
         public void Mission_RoverShouldMoveCorrectly_WithSequence_MMRMMRMRRM()
         {
             var rover = _mission.AddRover(3, 3, Direction.E);
-            _mission.SendInstructionsToRover(rover, "MMRMMRMRRM");
+            Mission.SendInstructionsToRover(rover, "MMRMMRMRRM");
 
             Assert.That(rover.Position.X, Is.EqualTo(5));
             Assert.That(rover.Position.Y, Is.EqualTo(1));
@@ -60,10 +60,10 @@ namespace RoverControl.Tests
         }
 
         [Test]
-        public void Mission_RoverShouldMoveCorrectly_WithSequence_MMMMMLMMMMMLMMMMMLMMMMM()
+        public void Mission_RoverShouldMoveCorrectly_WithSequence_MMMMMLMMMMMLMMMMMLMMMMR()
         {
             var rover = _mission.AddRover(0, 0, Direction.E);
-            _mission.SendInstructionsToRover(rover, "MMMMMLMMMMMLMMMMMLMMMMR");
+            Mission.SendInstructionsToRover(rover, "MMMMMLMMMMMLMMMMMLMMMMR");
 
             Assert.That(rover.Position.X, Is.EqualTo(0));
             Assert.That(rover.Position.Y, Is.EqualTo(1));
@@ -74,7 +74,7 @@ namespace RoverControl.Tests
         public void Mission_RoverShouldNotMoveOutsidePlateau()
         {
             var rover = _mission.AddRover(5, 5, Direction.E);
-            _mission.SendInstructionsToRover(rover, "MLM");
+            Mission.SendInstructionsToRover(rover, "MLM");
 
             Assert.That(rover.Position.X, Is.EqualTo(5));
             Assert.That(rover.Position.Y, Is.EqualTo(5));
@@ -86,7 +86,7 @@ namespace RoverControl.Tests
         {
             var mission = new Mission(new Plateau(1, 1));
             var rover = mission.AddRover(0, 0, Direction.E);
-            mission.SendInstructionsToRover(rover, "MRMMRLMML");
+            Mission.SendInstructionsToRover(rover, "MRMMRLMML");
 
             Assert.That(rover.Position.X, Is.EqualTo(0));
             Assert.That(rover.Position.Y, Is.EqualTo(0));
@@ -97,7 +97,7 @@ namespace RoverControl.Tests
         public void Mission_RoverShouldSkipIncorrectCommand()
         {
             var rover = _mission.AddRover(1, 2, Direction.N);
-            _mission.SendInstructionsToRover(rover, "OLMPSSSLMLMLMMX");
+            Mission.SendInstructionsToRover(rover, "OLMPSSSLMLMLMMX");
 
             Assert.That(rover.Position.X, Is.EqualTo(1));
             Assert.That(rover.Position.Y, Is.EqualTo(3));
@@ -108,7 +108,7 @@ namespace RoverControl.Tests
         public void Mission_RoverShouldNotMoveIfGivenEmptyInstruction()
         {
             var rover = _mission.AddRover(1, 2, Direction.N);
-            _mission.SendInstructionsToRover(rover, "");
+            Mission.SendInstructionsToRover(rover, "");
 
             Assert.That(rover.Position.X, Is.EqualTo(1));
             Assert.That(rover.Position.Y, Is.EqualTo(2));

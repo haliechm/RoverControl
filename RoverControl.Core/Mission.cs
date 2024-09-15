@@ -20,7 +20,7 @@ namespace RoverControl.Core
             return rover;
         }
 
-        public void SendInstructionsToRover(Rover rover, string instruction)
+        public static void SendInstructionsToRover(Rover rover, string instruction)
         {
             if (rover == null) throw new ArgumentNullException(nameof(rover));
             if (instruction == null) throw new ArgumentNullException(nameof(instruction));
