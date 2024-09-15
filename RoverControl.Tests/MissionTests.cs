@@ -19,7 +19,7 @@ namespace RoverControl.Tests
         {
             var mission = new Mission(_plateau);
             var rover = mission.AddRover(1, 2, Direction.N);
-            mission.MoveRover(rover, "LMLMLMLMM");
+            mission.SendInstructionsToRover(rover, "LMLMLMLMM");
 
             Assert.That(rover.Position.X, Is.EqualTo(1));
             Assert.That(rover.Position.Y, Is.EqualTo(3));
@@ -31,7 +31,7 @@ namespace RoverControl.Tests
         {
             var mission = new Mission(_plateau);
             var rover = mission.AddRover(3, 3, Direction.E);
-            mission.MoveRover(rover, "MMRMMRMRRM");
+            mission.SendInstructionsToRover(rover, "MMRMMRMRRM");
 
             Assert.That(rover.Position.X, Is.EqualTo(5));
             Assert.That(rover.Position.Y, Is.EqualTo(1));

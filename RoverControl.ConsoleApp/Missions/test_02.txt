@@ -1,0 +1,7 @@
+﻿5 5
+1 1 N
+OXLLMMRM
+4 4
+LLLM
+5 5 S
+M
