@@ -24,7 +24,6 @@ namespace RoverControl.Tests
             Assert.That(copiedPosition.X, Is.EqualTo(originalPosition.X));
             Assert.That(copiedPosition.Y, Is.EqualTo(originalPosition.Y));
             Assert.That(copiedPosition.Orientation, Is.EqualTo(originalPosition.Orientation));
-
             Assert.That(copiedPosition, Is.Not.SameAs(originalPosition));
         }
     }
